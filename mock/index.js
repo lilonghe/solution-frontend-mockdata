@@ -13,13 +13,18 @@ module.exports = function(app){
         app.all('/mock/*', function (req, res) {
             var devAPIMap = getJsonFile('./mock.json');
             const { method } = req;
-            const finalPath = method + " /" + req.originalUrl.split('/').slice(2).join('/').split("?")[0];
-
+            const finalPath = method + " /" + req.path.split('/').slice(2).join('/');
+            const query = req.query;
             if (devAPIMap[finalPath]) {
-                let response = devAPIMap[finalPath].response || devAPIMap[finalPath];
-                res.json(Mock.mock(response));
+                let response = JSON.stringify(devAPIMap[finalPath].response || devAPIMap[finalPath]);
+
+                Object.keys(query).map(key => {
+                    response = response.replaceAll(`\$${key}`, query[key]);
+                });
+
+                res.json(Mock.mock(JSON.parse(response)));
             } else {
-                res.text('404');
+                res.send('404');
             }
         });
     });

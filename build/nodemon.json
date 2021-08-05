@@ -1,4 +1,4 @@
 {
-    "watch": ["./build/*", "./src/.eslintrc"],
+    "watch": ["./build/*", "./src/.eslintrc", "./mock/index.js"],
     "exec": "webpack serve --config=build/webpack.dev.js"
  }
