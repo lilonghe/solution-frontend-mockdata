@@ -1,0 +1,8 @@
+{
+    "GET /user": {
+        "response": {
+            "name": "lilonghe",
+            "email": "lilonghe@gmail.com"
+        }
+    }
+}
