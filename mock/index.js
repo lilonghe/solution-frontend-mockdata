@@ -1,6 +1,7 @@
 const Mock = require('mockjs');
 const fs = require('fs');
 const path = require('path');
+const pathToRegexp = require('path-to-regexp');
 
 function getJsonFile(filePath) {
     var json = fs.readFileSync(path.resolve(__dirname,filePath), 'utf-8');
@@ -13,7 +14,9 @@ module.exports = function(app){
         app.all('/mock/*', function (req, res) {
             var devAPIMap = getJsonFile('./mock.json');
             const { method } = req;
-            const finalPath = method + " /" + req.path.split('/').slice(2).join('/');
+            let userPath = method + " /" + req.path.split('/').slice(2).join('/');
+            const finalPath = Object.keys(devAPIMap).find(k => pathToRegexp(k).test(userPath))
+
             const query = req.query;
             if (devAPIMap[finalPath]) {
                 let response = JSON.stringify(devAPIMap[finalPath].response || devAPIMap[finalPath]);
