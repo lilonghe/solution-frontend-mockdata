@@ -20,6 +20,9 @@ let commonAPIList = {
             }
         }
     },
+    "GET /project/:id/list": {
+        response: {},
+    }
 }
 
 module.exports = {

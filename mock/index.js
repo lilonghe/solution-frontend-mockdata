@@ -23,12 +23,31 @@ const getAPIMap = () => {
     return apiMap || {};
 }
 
+function checkParams(rewPath, schemaPath) {
+    let pathArr = rewPath.split('/').slice(2);
+    let pathSchemaArr = schemaPath.split(' ')[1].split('/').slice(1);
+    let isOk = true;
+    pathSchemaArr.map((item, i) => {
+        if (item.startsWith(':')) {
+            if (pathArr[i] === 'undefined' || pathArr[i] === 'null') {
+                isOk = false;
+            }
+        }
+    });
+    return isOk;
+}
+
 module.exports = function(app){
     app.all('/mock/*', function (req, res) {
         const devAPIMap = getAPIMap();
         const { method } = req;
         let userPath = method + " /" + req.path.split('/').slice(2).join('/');
-        const finalPath = Object.keys(devAPIMap).find(k => pathToRegexp(k).test(userPath))
+        const finalPath = Object.keys(devAPIMap).find(k => pathToRegexp(k).test(userPath));
+
+        if (!checkParams(req.path, finalPath)){
+            res.status(500).send('params error');
+            return;
+        }
 
         const query = req.query;
         if (devAPIMap[finalPath]) {
@@ -45,7 +64,7 @@ module.exports = function(app){
 
             res.json(Mock.mock(JSON.parse(response)));
         } else {
-            res.send('404');
+            res.status(404).send('404');
         }
     });
 }
